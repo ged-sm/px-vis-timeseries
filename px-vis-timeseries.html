@@ -1636,13 +1636,14 @@ Custom property | Description
           this._deleteStripe();
 
           // mock a extentsDataChange to pass data to the stripe creation fn
+          // setting the exData here so that the the event is not fired with extentsData as undefined
           var exData = [this.x.invert(brushExt[0]).getTime(), this.x.invert(brushExt[1]).getTime()];
 
           if (!this.extentsData) {
             this.extentsData = {eX: exData};
+          } else {
+            this.extentsData.eX = exData;
           }
-
-          this.extentsData.eX = exData;
         
           this._createStripe();
         }
