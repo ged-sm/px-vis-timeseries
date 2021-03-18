@@ -1151,6 +1151,12 @@ Custom property | Description
 
       this.set('width', Math.max(wrapperRect.width - widthDeduct, 0));
       this.set('height', Math.max(wrapperRect.height - heightDeduct, 0));
+
+      // rebuild the stripe rectangle handles whenever the chart resizes
+      if (this._internalMargin && this.stripeConfig) {
+        this._buildStripeHandles();
+      }
+
       this._computeVerticalRegisterHeight([navigatorHeight, toolbarRect.height]);
     },
 
