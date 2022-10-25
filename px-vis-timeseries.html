@@ -780,9 +780,11 @@ Custom property | Description
             this._extentsDataRoutes['stripe'] = '_createStripe';
         },
         detached: function detached() {
-            this.chartData = [];
-            this.markerData = [];
-            this._markerData = [];
+            //these lines of code are causing issues while dragging & dropping charts
+            // we will come back to this later
+            // this.chartData = [];
+            // this.markerData = [];
+            // this._markerData = [];
         },
         _getWrapperClass: function(_registerWrapperClass) {
             var classList = _registerWrapperClass + ' flex__item wrapper'
