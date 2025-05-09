@@ -715,7 +715,21 @@ Custom property | Description
             _stripeDataIndex: {
                 type: Number,
                 value: null
-            }
+            },
+            /**
+             * Variable for timing diagram functionality
+             */ 
+            updatedChartData: {
+			  type: Array,
+			  value: null
+			},
+            /**
+             * Variable for timing diagram functionality
+             */ 
+			plotDigitalTags: {
+			  type: Boolean,
+			  value: false
+			}
         },
 
         observers: [
@@ -744,7 +758,9 @@ Custom property | Description
             '_tooltipDataUpdated(tooltipData.*)',
 
             //renderer
-            '_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, renderToCanvas)',
+            // Commented for timing diagram functionality
+            // '_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, renderToCanvas)',
+            '_updateChartDataBeforeRender(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, renderToCanvas)',
             '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)',
             '_renderSeriesOnTop(serieToRedrawOnTop)',
             '_renderMarkers(canvasLayers.markers, domainChanged, markerData, markerConfig, preventInitialDrawing)'
@@ -1026,9 +1042,10 @@ Custom property | Description
             this.set('height', Math.max(wrapperRect.height - heightDeduct, 0));
 
             // rebuild the stripe rectangle handles whenever the chart resizes
-            if (this._internalMargin && this.stripeConfig) {
-                this._buildStripeHandles();
-            }
+            // Commented for timing diagram functionality
+            // if (this._internalMargin && this.stripeConfig) {
+            //     this._buildStripeHandles();
+            // }
 
             this._computeVerticalRegisterHeight([navigatorHeight, toolbarRect.height]);
         },
@@ -1541,6 +1558,74 @@ Custom property | Description
 
         _showRef() {
             return this.referenceData && this.referenceData.length ? true : false;
-        }
+        },
+
+        _isDigitalTag(item, completeSeriesConfig) {
+		    return completeSeriesConfig[item].isLogical;
+	    },
+
+	    _getYaxisRanges: function _getYaxisRanges(noOfSteps) {
+            // let yDomain;
+            var yDomain = this.y[this.axes[0]].domain();
+            var lowerBound = yDomain[0];
+            var upperBound = yDomain[1];
+            var step = (upperBound - lowerBound) / (noOfSteps * 2);
+            var ranges = [];
+            var i = lowerBound - step * 0.5;
+            while (i < upperBound) {
+            var off = i + step;
+            var on = off + step;
+            ranges.push({
+                on: on,
+                off: off
+            });
+            i = on;
+            }
+            return ranges;
+	    },
+
+	    _updateChartDataBeforeRender: function _updateChartDataBeforeRender() {
+            if (!this.plotDigitalTags) {
+                this.set('updatedChartData', this.chartData);
+                //this._renderChartData();
+                this._renderChartData(this.chartData, this.mutedSeries, this.completeSeriesConfig);
+            } else {
+                this.debounce('updateChartData', function () {
+                    var _this2 = this;
+                    var boolTagIds = _.filter(_.keys(this.completeSeriesConfig), function (tagId) {
+                    return _this2.completeSeriesConfig[tagId].isLogical && !_this2.mutedSeries[tagId];
+                    });
+                    var yaxisRanges = this._getYaxisRanges(boolTagIds.length);
+                    var visChartData = _.cloneDeep(this.chartData);
+                    _.forEach(boolTagIds, function (boolTagId, idx) {
+                    var t1Off = yaxisRanges[idx].off;
+                    var t1On = yaxisRanges[idx].on;
+                    visChartData = visChartData.map(function (item, idx1) {
+                        if (item[boolTagId] == undefined || item[boolTagId] == null) {
+                        return item;
+                        }
+                        return _objectSpread(_objectSpread({}, item), {}, _defineProperty({}, boolTagId, (t1On - t1Off) * item[boolTagId] + t1Off));
+                    });
+                    });
+                    this.set('updatedChartData', visChartData);
+                    this._renderChartData(visChartData, this.mutedSeries, this.completeSeriesConfig);
+                    //this._renderChartData();
+                    this._keepUpdatedDataInSync();
+                }.bind(this), 100);
+            }
+	  },
+	  _keepUpdatedDataInSync: function _keepUpdatedDataInSync() {
+		if (!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
+		  this._wwSyncDataDeleted = false;
+		  Px.vis.scheduler.process({
+			'action': 'updateRenderedData',
+			'originatorName': this.nodeName,
+			'chartId': this.chartId,
+			'data': {
+			  'chartData': this['updatedChartData']
+			}
+		  });
+		}
+	  }
     });
 </script>
