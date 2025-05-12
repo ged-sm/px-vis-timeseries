@@ -247,7 +247,7 @@ Custom property | Description
             id="lineCanvas"
             canvas-context="[[canvasContext]]"
             series-id="[[item]]"
-            chart-data="[[chartData]]"
+            chart-data="[[updatedChartData]]"
             complete-series-config="[[completeSeriesConfig]]"
             x="[[x]]"
             y="[[_returnYScale(item, completeSeriesConfig, domainChanged)]]"
@@ -258,6 +258,7 @@ Custom property | Description
             height="[[height]]"
             margin="[[_internalMargin]]"
             clip-path
+            draw-digital-tags="[[_isDigitalTag(item, completeSeriesConfig)]]"
             interpolation-function="[[interpolationFunction]]"
             serie-to-redraw-on-top="[[serieToRedrawOnTop]]">
           </px-vis-line-canvas>
@@ -357,8 +358,8 @@ Custom property | Description
       </px-vis-gridlines>
     </template>
 
-    <px-vis-interaction-space id="interactionSpace" svg="[[layer.4]]" width="[[width]]" height="[[height]]" margin="[[_internalMargin]]" x-axis-type="[[xAxisType]]" series-keys="[[_seriesKeys]]" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]"
-        chart-id="[[chartId]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" mouse-rect="{{mouseRect}}" tooltip-data="{{tooltipData}}" crosshair-data="{{crosshairData}}" default-empty-data="[[defaultEmptyData]]" generating-crosshair-data="{{generatingCrosshairData}}"
+    <px-vis-interaction-space id="interactionSpace" svg="[[layer.4]]" width="[[width]]" height="[[height]]" margin="[[_internalMargin]]" x-axis-type="[[xAxisType]]" series-keys="[[_seriesKeys]]" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]" 
+         rendered-chart-data="[[updatedChartData]]" plot-digital-tags="[[plotDigitalTags]]" chart-id="[[chartId]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" mouse-rect="{{mouseRect}}" tooltip-data="{{tooltipData}}" crosshair-data="{{crosshairData}}" default-empty-data="[[defaultEmptyData]]" generating-crosshair-data="{{generatingCrosshairData}}"
         interaction-svg="{{interactionSvg}}" extents-data="{{extentsData}}" action-config="[[actionConfig]]" selection-type="[[selectionType]]" extents-action="{{extentsAction}}" muted-series="[[mutedSeries]]" hard-mute="[[hardMute]]" use-quadtree time-data="[[_getXKey(completeSeriesConfig)]]"
         prevent-web-worker-synchronization="[[preventWebWorkerSynchronization]]" ww-data-sync-counter="[[wwDataSyncCounter]]" log-base="[[logBase]]">
     </px-vis-interaction-space>
@@ -383,7 +384,7 @@ Custom property | Description
         time-data="[[_getXKey(completeSeriesConfig)]]"
         complete-series-config="[[completeSeriesConfig]]"
         series-keys="[[_seriesKeys]]"
-        chart-data="[[chartData]]"
+        chart-data="[[updatedChartData]]"
         generating-crosshair-data="[[generatingCrosshairData]]"
         crosshair-data="[[crosshairData]]"
         default-empty-data="{{defaultEmptyData}}"
