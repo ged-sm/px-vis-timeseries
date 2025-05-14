@@ -1604,8 +1604,8 @@ Custom property | Description
                     visChartData = visChartData.map(function (item, idx1) {
                         if (item[boolTagId] == undefined || item[boolTagId] == null) {
                         return item;
-                        }
-                        return _objectSpread(_objectSpread({}, item), {}, _defineProperty({}, boolTagId, (t1On - t1Off) * item[boolTagId] + t1Off));
+                        }                        
+                        return {...item, [boolTagId]: ( (t1On - t1Off) * item[boolTagId] ) + t1Off }
                     });
                     });
                     this.set('updatedChartData', visChartData);
