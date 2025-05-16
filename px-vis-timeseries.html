@@ -1605,7 +1605,7 @@ Custom property | Description
                         if (item[boolTagId] == undefined || item[boolTagId] == null) {
                         return item;
                         }                        
-                        return {...item, [boolTagId]: ( (t1On - t1Off) * item[boolTagId] ) + t1Off }
+                        return Object.assign(Object.assign({}, item), {}, _defineProperty({}, boolTagId, (t1On - t1Off) * item[boolTagId] + t1Off));
                     });
                     });
                     this.set('updatedChartData', visChartData);
